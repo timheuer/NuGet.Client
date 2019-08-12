@@ -3,6 +3,7 @@
 
 using System;
 using System.Security.Cryptography.X509Certificates;
+using NuGet.Common;
 
 namespace Test.Utility.Signing
 {
@@ -36,18 +37,41 @@ namespace Test.Utility.Signing
         /// Trust the PublicCert cert for the life of the object.
         /// </summary>
         /// <remarks>Dispose of the object returned!</remarks>
-        public TrustedTestCert<TestCertificate> WithTrust(StoreName storeName = StoreName.TrustedPeople, StoreLocation storeLocation = StoreLocation.CurrentUser)
+        /// According to https://github.com/dotnet/corefx/blob/master/Documentation/architecture/cross-platform-cryptography.md#x509store
+        /// only windows can read/write LocalMachine\Root, Linux can read/write CurrentUser\Root, mac ??
+        public TrustedTestCert<TestCertificate> WithTrust()
         {
-            return new TrustedTestCert<TestCertificate>(this, e => PublicCert, storeName, storeLocation);
+            
+            if (RuntimeEnvironmentHelper.IsWindows)
+            {
+                return new TrustedTestCert<TestCertificate>(this, e => PublicCert, StoreName.Root, StoreLocation.LocalMachine);
+            }
+
+            if (RuntimeEnvironmentHelper.IsLinux)
+            {
+                return new TrustedTestCert<TestCertificate>(this, e => PublicCert, StoreName.Root, StoreLocation.CurrentUser);
+            }
+            //TODO: how about other enviroments? 
+           
+            return new TrustedTestCert<TestCertificate>(this, e => PublicCert, StoreName.Root, StoreLocation.CurrentUser);
         }
 
         /// <summary>
         /// Trust the PublicCert cert for the life of the object.
         /// </summary>
         /// <remarks>Dispose of the object returned!</remarks>
-        public TrustedTestCert<TestCertificate> WithPrivateKeyAndTrust(StoreName storeName = StoreName.TrustedPeople, StoreLocation storeLocation = StoreLocation.CurrentUser)
+        public TrustedTestCert<TestCertificate> WithPrivateKeyAndTrust(StoreName storeName = StoreName.TrustedPeople)
         {
-            return new TrustedTestCert<TestCertificate>(this, e => PublicCertWithPrivateKey, storeName, storeLocation);
+            if (RuntimeEnvironmentHelper.IsWindows)
+            {
+                return new TrustedTestCert<TestCertificate>(this, e => PublicCertWithPrivateKey, storeName, StoreLocation.LocalMachine);
+            }
+            else if (RuntimeEnvironmentHelper.IsLinux)
+            {
+                return new TrustedTestCert<TestCertificate>(this, e => PublicCertWithPrivateKey, storeName, StoreLocation.CurrentUser);
+            }
+            //TODO: how about other enviroments? mac,mono and so on
+            return  new TrustedTestCert<TestCertificate>(this, e => PublicCertWithPrivateKey, storeName, StoreLocation.CurrentUser);
         }
 
         public static string GenerateCertificateName()

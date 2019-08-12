@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-#if IS_DESKTOP
+#if IS_SIGNING_SUPPORTED
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,10 +44,11 @@ namespace NuGet.Packaging.FuncTest
                 responders.Add(testServer.RegisterResponder(intermediateCa));
                 responders.Add(testServer.RegisterResponder(rootCa));
 
+                //TODO: how about other runtime environment?
                 using (var trustedServerRoot = TrustedTestCert.Create(
                     new X509Certificate2(rootCa.Certificate.GetEncoded()),
                     StoreName.Root,
-                    StoreLocation.LocalMachine))
+                    (RuntimeEnvironmentHelper.IsWindows) ? StoreLocation.LocalMachine: StoreLocation.CurrentUser))
                 {
                     var timestampService = TimestampService.Create(intermediateCa);
 

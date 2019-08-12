@@ -5,8 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-#if IS_DESKTOP
-using System.Security.Cryptography;
+#if IS_SIGNING_SUPPORTED
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -20,7 +19,7 @@ namespace NuGet.Packaging.Signing
     /// </summary>
     public abstract class Signature : ISignature
     {
-#if IS_DESKTOP
+#if IS_SIGNING_SUPPORTED
         private readonly Lazy<IReadOnlyList<Timestamp>> _timestamps;
 
         /// <summary>

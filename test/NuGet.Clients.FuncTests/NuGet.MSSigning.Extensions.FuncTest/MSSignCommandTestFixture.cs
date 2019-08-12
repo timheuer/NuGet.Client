@@ -7,6 +7,7 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using NuGet.CommandLine.Test;
+using NuGet.Common;
 using Test.Utility.Signing;
 
 namespace NuGet.MSSigning.Extensions.FuncTest.Commands
@@ -46,7 +47,7 @@ namespace NuGet.MSSigning.Extensions.FuncTest.Commands
                     // Code Sign EKU needs trust to a root authority
                     // Add the cert to Root CA list in LocalMachine as it does not prompt a dialog
                     // This makes all the associated tests to require admin privilege
-                    _trustedTestCertWithPrivateKey = TestCertificate.Generate(actionGenerator).WithPrivateKeyAndTrust(StoreName.Root, StoreLocation.LocalMachine);
+                    _trustedTestCertWithPrivateKey = TestCertificate.Generate(actionGenerator).WithPrivateKeyAndTrust(StoreName.Root);
                 }
 
                 return _trustedTestCertWithPrivateKey;
@@ -64,7 +65,7 @@ namespace NuGet.MSSigning.Extensions.FuncTest.Commands
                     // Code Sign EKU needs trust to a root authority
                     // Add the cert to Root CA list in LocalMachine as it does not prompt a dialog
                     // This makes all the associated tests to require admin privilege
-                    _trustedTestCertWithoutPrivateKey = TestCertificate.Generate(actionGenerator).WithTrust(StoreName.Root, StoreLocation.LocalMachine);
+                    _trustedTestCertWithoutPrivateKey = TestCertificate.Generate(actionGenerator).WithTrust();
                 }
 
                 return _trustedTestCertWithoutPrivateKey;
@@ -103,11 +104,12 @@ namespace NuGet.MSSigning.Extensions.FuncTest.Commands
             var intermediateCa = rootCa.CreateIntermediateCertificateAuthority();
             var rootCertificate = new X509Certificate2(rootCa.Certificate.GetEncoded());
 
+            //TODO: how about other runtime environment?
             _trustedTimestampRoot = TrustedTestCert.Create(
                 rootCertificate,
                 StoreName.Root,
-                StoreLocation.LocalMachine);
-
+                (RuntimeEnvironmentHelper.IsWindows) ? StoreLocation.LocalMachine : StoreLocation.CurrentUser);
+            
             var ca = intermediateCa;
 
             while (ca != null)

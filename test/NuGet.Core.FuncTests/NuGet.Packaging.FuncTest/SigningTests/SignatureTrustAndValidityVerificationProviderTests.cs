@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-#if IS_DESKTOP
+#if IS_SIGNING_SUPPORTED
 
 using System;
 using System.Collections.Generic;
@@ -2302,10 +2302,11 @@ namespace NuGet.Packaging.FuncTest
         {
             var rootCertificate = certificateChain.Last();
 
+            //TODO: how about other runtime environment?
             return TrustedTestCert.Create(
                 new X509Certificate2(rootCertificate),
                 StoreName.Root,
-                StoreLocation.LocalMachine,
+                (RuntimeEnvironmentHelper.IsWindows)? StoreLocation.LocalMachine : StoreLocation.CurrentUser,
                 maximumValidityPeriod: TimeSpan.MaxValue);
         }
     }

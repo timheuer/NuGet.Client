@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <RequiresSigningXplatAPIs>true</RequiresSigningXplatAPIs>
   </PropertyGroup>
@@ -49,6 +49,8 @@
 
   <ItemGroup Condition=" '$(IsCore)' == 'true' ">
     <PackageReference Include="System.Dynamic.Runtime" Version="$(SystemPackagesVersion)" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="4.6.0-preview8.19405.3" />
+    <PackageReference Include="System.Security.Cryptography.Cng" Version="4.6.0-preview8.19405.3" />
   </ItemGroup>
 
   <ItemGroup>
