@@ -174,6 +174,12 @@
       <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
     </CommandPlacement>
 
+    <CommandPlacement  guid="guidToolsGroup" id="idLibraryPackageManager">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2" />
+    </CommandPlacement>
+
+    
+    
     <CommandPlacement guid="guidPowerConsoleCmdSet" id="cmdidPowerConsole" priority="0x0100">
       <Parent guid="guidToolsGroup" id="idToolsGroup"/>
     </CommandPlacement>
@@ -190,6 +196,9 @@
     </CommandPlacement>
     <CommandPlacement guid="guidDialogCmdSet" id="cmdidAddPackages" priority="0xF100">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_REFROOT_ADD"/>
+    </CommandPlacement>
+    <CommandPlacement guid="guidDialogCmdSet" id="cmdidAddPackages">
+      <Parent guid="guidReferenceContext" id="cmdAddReferenceGroup" />
     </CommandPlacement>
     <CommandPlacement guid="guidDialogCmdSet" id="cmdidAddPackages" priority="0xF100">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD"/>
@@ -245,7 +254,7 @@
     <GuidSymbol name="guidToolsGroup" value="{C0D88179-5D25-4982-BFE6-EC5FD59AC103}">
       <IDSymbol name="idLibraryPackageManager" value="0x100" />
       <IDSymbol name="idToolsGroup" value="0x200" />
-      <IDSymobl name="idGeneralSettings" value="0x300" />
+      <IDSymbol name="idGeneralSettings" value="0x300" />
     </GuidSymbol>
     <GuidSymbol name="guidDialogCmdSet" value="{25fd982b-8cae-4cbd-a440-e03ffccde106}">
       <IDSymbol name="cmdidAddPackages" value="0x0100" />
@@ -259,7 +268,7 @@
       <IDSymbol name="IDG_CTX_REFERENCE" value="0x102" />
     </GuidSymbol>
     <GuidSymbol name="guidReferenceContext" value="{D309F791-903F-11D0-9EFC-00A0C911004F}">
-      <IdSymbol name="cmdAddReferenceGroup" value="0x450" />
+      <IDSymbol name="cmdAddReferenceGroup" value="0x450" />cmdAddReferenceGroup
     </GuidSymbol>
     <GuidSymbol name="UICONTEXT_SolutionExistsAndNotBuildingAndNotDebugging" value="{D0E4DEEC-1B53-4CDA-8559-D454583AD23B}" />
     <GuidSymbol name="guidNuGetDebugConsoleCmdSet" value="{DDC61543-6CA7-4A6F-A5B7-984BE723C52F}">
@@ -273,6 +282,7 @@
       <IDSymbol name="InstalledIndicator" value="5" />
       <IDSymbol name="MigratorHelpIcon" value="6" />
     </GuidSymbol>
+
   </Symbols>
 
 </CommandTable>
