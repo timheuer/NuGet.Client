@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Protocol.Cancellation;
 
 namespace NuGet.Protocol.Plugins
 {
@@ -29,6 +30,7 @@ namespace NuGet.Protocol.Plugins
             _connection = connection;
             _request = request;
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _cancellationTokenSource.Register("AutomaticProgressReporter");
             _cancellationToken = _cancellationTokenSource.Token;
             _semaphore = new SemaphoreSlim(initialCount: 1, maxCount: 1);
             _timer = new Timer(OnTimer, state: null, dueTime: interval, period: interval);
@@ -56,7 +58,7 @@ namespace NuGet.Protocol.Plugins
                 {
                     using (_cancellationTokenSource)
                     {
-                        _cancellationTokenSource.Cancel();
+                        _cancellationTokenSource.Cancel("Disposing AutomaticProgressReporter");
                     }
                 }
                 catch (Exception)

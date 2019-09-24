@@ -19,6 +19,7 @@ using Newtonsoft.Json;
 using NuGet.Packaging.PackageExtraction;
 using NuGet.Packaging.Signing;
 using System.Net;
+using NuGet.Protocol.Cancellation;
 
 namespace NuGet.Protocol.Core.Types
 {
@@ -70,6 +71,7 @@ namespace NuGet.Protocol.Core.Types
 
             using (var tokenSource = new CancellationTokenSource())
             {
+                tokenSource.Register("PackageUpdateResource.Push timeout");
                 var requestTimeout = TimeSpan.FromSeconds(timeoutInSecond);
                 tokenSource.CancelAfter(requestTimeout);
                 var apiKey = getApiKey(_source);

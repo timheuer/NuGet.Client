@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Protocol.Cancellation;
 
 namespace NuGet.Protocol.Plugins
 {
@@ -79,6 +80,7 @@ namespace NuGet.Protocol.Plugins
             RequestId = requestId;
 
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _cancellationTokenSource.Register($"InboundRequestContext {requestId}");
 
             // Capture the cancellation token now because if the cancellation token source
             // is disposed race conditions may cause an exception acccessing its Token property.
@@ -101,7 +103,7 @@ namespace NuGet.Protocol.Plugins
             {
                 using (_cancellationTokenSource)
                 {
-                    _cancellationTokenSource.Cancel();
+                    _cancellationTokenSource.Cancel("Disposing InboundRequestContext");
                 }
             }
             catch (Exception)
@@ -255,7 +257,7 @@ namespace NuGet.Protocol.Plugins
         {
             try
             {
-                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Cancel("Cancelling request");
             }
             catch (ObjectDisposedException)
             {

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
+using NuGet.Protocol.Cancellation;
 using NuGet.Protocol.Core.Types;
 
 namespace NuGet.PackageManagement
@@ -76,6 +77,7 @@ namespace NuGet.PackageManagement
             var tasksLookup = new Dictionary<Task<DownloadResourceResult>, SourceRepository>();
 
             var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+            linkedTokenSource.Register("Source for cancelling parallel work when the first one finishes");
             try
             {
                 // Create a group of local sources that will go first, then everything else.
@@ -128,7 +130,7 @@ namespace NuGet.PackageManagement
                             tasks.Remove(completedTask);
 
                             // Cancel the other tasks, since, they may still be running
-                            linkedTokenSource.Cancel();
+                            linkedTokenSource.Cancel("Cancelling parallel work");
 
                             if (tasks.Any())
                             {
