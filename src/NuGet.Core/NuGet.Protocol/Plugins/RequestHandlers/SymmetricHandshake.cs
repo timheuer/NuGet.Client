@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Protocol.Cancellation;
 using NuGet.Versioning;
 
 namespace NuGet.Protocol.Plugins
@@ -71,10 +72,11 @@ namespace NuGet.Protocol.Plugins
             _handshakeFailedResponse = new HandshakeResponse(MessageResponseCode.Error, protocolVersion: null);
             _responseSentTaskCompletionSource = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
             _timeoutCancellationTokenSource = new CancellationTokenSource(handshakeTimeout);
+            _timeoutCancellationTokenSource.Register("Handshake timeout");
 
             _timeoutCancellationTokenSource.Token.Register(() =>
             {
-                _responseSentTaskCompletionSource.TrySetCanceled();
+                _responseSentTaskCompletionSource.TrySetCanceled(_timeoutCancellationTokenSource.Token);
             });
 
             CancellationToken = _timeoutCancellationTokenSource.Token;

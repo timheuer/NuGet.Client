@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Protocol.Cancellation;
 
 namespace NuGet.Protocol.Plugins
 {
@@ -422,6 +423,7 @@ namespace NuGet.Protocol.Plugins
 
             using (var cancellationTokenSource = new CancellationTokenSource(PluginConstants.CloseTimeout))
             {
+                cancellationTokenSource.Register("SendCloseRequest timeout");
                 try
                 {
                     plugin.Connection.SendAsync(message, cancellationTokenSource.Token).Wait();
@@ -445,6 +447,7 @@ namespace NuGet.Protocol.Plugins
         private static void WriteCommonLogMessages(IPluginLogger logger)
         {
             logger.Write(new AssemblyLogMessage(logger.Now));
+            logger.Write(new EntryAssemblyLogMessage(logger.Now));
             logger.Write(new MachineLogMessage(logger.Now));
             logger.Write(new EnvironmentVariablesLogMessage(logger.Now));
             logger.Write(new ProcessLogMessage(logger.Now));

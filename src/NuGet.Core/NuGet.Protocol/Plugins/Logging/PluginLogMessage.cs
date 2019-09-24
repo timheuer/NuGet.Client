@@ -39,4 +39,20 @@ namespace NuGet.Protocol.Plugins
             return outerMessage.ToString(Formatting.None, _enumConverter);
         }
     }
+
+    class InfoLogMessage : PluginLogMessage
+    {
+        public string Text { get; }
+
+        public InfoLogMessage(DateTimeOffset now, string text)
+            : base(now)
+        {
+            Text = text;
+        }
+
+        public override string ToString()
+        {
+            return ToString("info", JObject.FromObject(new {text = Text}));
+        }
+    }
 }

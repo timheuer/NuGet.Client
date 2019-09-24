@@ -1,9 +1,10 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Protocol.Cancellation;
 
 namespace NuGet.Protocol
 {
@@ -32,21 +33,24 @@ namespace NuGet.Protocol
              * first, it could be that the response came back or that the caller cancelled
              * the task.
              */
+            token.EnsureSourceRegistered("StartWithTimeout input token");
             using (var timeoutTcs = new CancellationTokenSource())
             using (var taskTcs = new CancellationTokenSource())
-            using (token.Register(() => taskTcs.Cancel()))
+            using (token.Register(() => taskTcs.Cancel("Propagating cancelation of StartWithTimeout input token")))
             {
+                timeoutTcs.Register("Timeout");
+                taskTcs.Register("Task");
                 var timeoutTask = Task.Delay(timeout, timeoutTcs.Token);
                 var responseTask = getTask(taskTcs.Token);
 
                 if (timeoutTask == await Task.WhenAny(responseTask, timeoutTask).ConfigureAwait(false))
                 {
-                    taskTcs.Cancel();
+                    taskTcs.Cancel("Timed out");
 
                     throw new TimeoutException(timeoutMessage);
                 }
 
-                timeoutTcs.Cancel();
+                timeoutTcs.Cancel("Completed task");
                 return await responseTask.ConfigureAwait(false);
             }
         }

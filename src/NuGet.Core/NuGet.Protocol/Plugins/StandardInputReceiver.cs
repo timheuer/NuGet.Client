@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Protocol.Cancellation;
 
 namespace NuGet.Protocol.Plugins
 {
@@ -35,6 +36,7 @@ namespace NuGet.Protocol.Plugins
 
             _reader = reader;
             _receiveCancellationTokenSource = new CancellationTokenSource();
+            _receiveCancellationTokenSource.Register("StandardInputReceiver");
         }
 
         /// <summary>
@@ -53,7 +55,7 @@ namespace NuGet.Protocol.Plugins
             {
                 using (_receiveCancellationTokenSource)
                 {
-                    _receiveCancellationTokenSource.Cancel();
+                    _receiveCancellationTokenSource.Cancel("Disposing StandardInputReceiver");
 
                     // Do not attempt to wait on completion of the receive thread task.
                     // In scenarios where standard input is backed by a non-blocking stream

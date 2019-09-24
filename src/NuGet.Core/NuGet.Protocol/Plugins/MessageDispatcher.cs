@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Protocol.Cancellation;
 
 namespace NuGet.Protocol.Plugins
 {
@@ -481,11 +482,13 @@ namespace NuGet.Protocol.Plugins
 
                         return await requestContext.CompletionTask;
                     }
-                    catch (OperationCanceledException) when (requestContext.CancellationToken.IsCancellationRequested)
+                    catch (OperationCanceledException ex) when (requestContext.CancellationToken.IsCancellationRequested)
                     {
                         if (_logger.IsEnabled)
                         {
                             _logger.Write(new CommunicationLogMessage(_logger.Now, message.RequestId, message.Method, message.Type, MessageState.Cancelled));
+                            _logger.Write(new InfoLogMessage(_logger.Now, $"Exception token: {ex.CancellationToken.DumpDiagnostics()}"));
+                            _logger.Write(new InfoLogMessage(_logger.Now, $"Request context token: {requestContext.CancellationToken.DumpDiagnostics()}"));
                         }
 
                         // Keep the request context around if cancellation was requested.

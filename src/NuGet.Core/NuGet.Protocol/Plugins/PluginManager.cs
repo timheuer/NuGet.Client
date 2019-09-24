@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Packaging;
+using NuGet.Protocol.Cancellation;
 using NuGet.Protocol.Core.Types;
 using NuGet.Shared;
 
@@ -262,11 +263,17 @@ namespace NuGet.Protocol.Plugins
                 }
                 catch (Exception e)
                 {
+                    var message = e.Message;
+                    if (e is OperationCanceledException oce)
+                    {
+                        message += "\n" + oce.CancellationToken.DumpDiagnostics();
+                    }
+
                     pluginCreationResult = new PluginCreationResult(
                         string.Format(CultureInfo.CurrentCulture,
                             Strings.Plugin_ProblemStartingPlugin,
                             result.PluginFile.Path,
-                            e.Message),
+                            message),
                         e);
                 }
             }
