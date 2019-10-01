@@ -212,6 +212,7 @@ namespace NuGet.Protocol.Plugins
             {
                 try
                 {
+                    Debugger.Launch();
                     if (result.PluginFile.State.Value == PluginFileState.Valid)
                     {
                         var plugin = await _pluginFactory.GetOrCreateAsync(
@@ -269,11 +270,12 @@ namespace NuGet.Protocol.Plugins
                         var dumpDiagnostics = oce.CancellationToken.DumpDiagnostics();
                         if (string.IsNullOrWhiteSpace(dumpDiagnostics))
                         {
-                            dumpDiagnostics = "The dump diagnostics was null or whitespace, which means not recorded." + "\n" + e.StackTrace;
+                            dumpDiagnostics = "The dump diagnostics was null or whitespace, which means not recorded.";
                         }
 
                         message += "\n" + oce.CancellationToken.DumpDiagnostics();
                     }
+                    message += "\n" + e.StackTrace;
 
                     pluginCreationResult = new PluginCreationResult(
                         string.Format(CultureInfo.CurrentCulture,
