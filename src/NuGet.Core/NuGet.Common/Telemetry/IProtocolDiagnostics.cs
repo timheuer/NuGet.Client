@@ -7,6 +7,15 @@ namespace NuGet.Common
 {
     public interface IProtocolDiagnostics
     {
-        void OnEvent(string source, string url, TimeSpan? headerDuration, TimeSpan requestDuration, bool isSuccess, bool isRetry, bool isCancelled);
+        void OnEvent(
+            string source,
+            string url,
+            TimeSpan? headerDuration,
+            TimeSpan requestDuration,
+            int? httpStatusCode,
+            long bodyBytes,
+            bool isSuccess,
+            bool isRetry,
+            bool isCancelled);
     }
 }

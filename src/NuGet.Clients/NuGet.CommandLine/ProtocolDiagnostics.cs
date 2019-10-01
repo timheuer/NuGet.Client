@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using Newtonsoft.Json;
 using NuGet.Common;
@@ -34,11 +35,24 @@ namespace NuGet.CommandLine
             _file = null;
         }
 
-        public void OnEvent(string source, string url, TimeSpan? headerDuration, TimeSpan requestDuration, bool isSuccess, bool isRetry, bool isCancelled)
+        public void OnEvent(
+            string source,
+            string url,
+            TimeSpan? headerDuration,
+            TimeSpan requestDuration,
+            int? httpStatucCode,
+            long bodyBytes,
+            bool isSuccess,
+            bool isRetry,
+            bool isCancelled)
         {
+            var timestamp = DateTime.UtcNow.ToString("o");
             lock (_lock)
             {
                 _jsonWriter.WriteStartObject();
+
+                _jsonWriter.WritePropertyName("timestamp");
+                _jsonWriter.WriteValue(timestamp);
 
                 _jsonWriter.WritePropertyName("source");
                 _jsonWriter.WriteValue(source);
@@ -54,6 +68,15 @@ namespace NuGet.CommandLine
 
                 _jsonWriter.WritePropertyName("requestDuration");
                 _jsonWriter.WriteValue(requestDuration.TotalMilliseconds);
+
+                if (httpStatucCode.HasValue)
+                {
+                    _jsonWriter.WritePropertyName("httpStatusCode");
+                    _jsonWriter.WriteValue(httpStatucCode.Value);
+                }
+
+                _jsonWriter.WritePropertyName("bodyBytes");
+                _jsonWriter.WriteValue(bodyBytes);
 
                 _jsonWriter.WritePropertyName("isSuccess");
                 _jsonWriter.WriteValue(isSuccess);
@@ -100,9 +123,17 @@ namespace NuGet.CommandLine
             _inner = inner;
         }
 
-        public void OnEvent(string source, string url, TimeSpan? headerDuration, TimeSpan requestDuration, bool isSuccess, bool isRetry, bool isCancelled)
+        public void OnEvent(string source,
+            string url,
+            TimeSpan? headerDuration,
+            TimeSpan requestDuration,
+            int? httpStatusCode,
+            long bodyBytes,
+            bool isSuccess,
+            bool isRetry,
+            bool isCancelled)
         {
-            _inner.OnEvent(source, url, headerDuration, requestDuration, isSuccess, isRetry, isCancelled);
+            _inner.OnEvent(source, url, headerDuration, requestDuration, httpStatusCode, bodyBytes, isSuccess, isRetry, isCancelled);
         }
     }
 }

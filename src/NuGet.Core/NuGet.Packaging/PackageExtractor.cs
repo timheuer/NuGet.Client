@@ -490,40 +490,40 @@ namespace NuGet.Packaging
                                             packageReader.ExtractFile(nuspecFile, targetNuspec, logger);
                                         }
 
-                                        if ((packageSaveMode & PackageSaveMode.Files) == PackageSaveMode.Files)
-                                        {
-                                            var nupkgFileName = Path.GetFileName(targetNupkg);
-                                            var nuspecFileName = Path.GetFileName(targetNuspec);
-                                            var hashFileName = Path.GetFileName(hashPath);
-                                            var nupkgMetadataFileName = Path.GetFileName(nupkgMetadataFilePath);
-                                            var packageFiles = packageReader.GetFiles()
-                                                .Where(file => ShouldInclude(file, hashFileName, nupkgMetadataFileName));
-                                            var packageFileExtractor = new PackageFileExtractor(
-                                                packageFiles,
-                                                packageExtractionContext.XmlDocFileSaveMode);
-                                            packageReader.CopyFiles(
-                                                targetPath,
-                                                packageFiles,
-                                                packageFileExtractor.ExtractPackageFile,
-                                                logger,
-                                                token);
-                                        }
+                                        //if ((packageSaveMode & PackageSaveMode.Files) == PackageSaveMode.Files)
+                                        //{
+                                        //    var nupkgFileName = Path.GetFileName(targetNupkg);
+                                        //    var nuspecFileName = Path.GetFileName(targetNuspec);
+                                        //    var hashFileName = Path.GetFileName(hashPath);
+                                        //    var nupkgMetadataFileName = Path.GetFileName(nupkgMetadataFilePath);
+                                        //    var packageFiles = packageReader.GetFiles()
+                                        //        .Where(file => ShouldInclude(file, hashFileName, nupkgMetadataFileName));
+                                        //    var packageFileExtractor = new PackageFileExtractor(
+                                        //        packageFiles,
+                                        //        packageExtractionContext.XmlDocFileSaveMode);
+                                        //    packageReader.CopyFiles(
+                                        //        targetPath,
+                                        //        packageFiles,
+                                        //        packageFileExtractor.ExtractPackageFile,
+                                        //        logger,
+                                        //        token);
+                                        //}
 
                                         nupkgStream.Position = 0;
-                                        var packageHash = Convert.ToBase64String(new CryptoHashProvider("SHA512").CalculateHash(nupkgStream));
+                                        //var packageHash = Convert.ToBase64String(new CryptoHashProvider("SHA512").CalculateHash(nupkgStream));
 
-                                        File.WriteAllText(tempHashPath, packageHash);
+                                        //File.WriteAllText(tempHashPath, packageHash);
 
                                         // get hash for the unsigned content of package
-                                        var contentHash = packageReader.GetContentHash(cancellationToken, GetUnsignedPackageHash: () => packageHash);
+                                        //var contentHash = packageReader.GetContentHash(cancellationToken, GetUnsignedPackageHash: () => packageHash);
 
                                         // write the new hash file
-                                        var hashFile = new NupkgMetadataFile()
-                                        {
-                                            ContentHash = contentHash
-                                        };
+                                        //var hashFile = new NupkgMetadataFile()
+                                        //{
+                                        //    ContentHash = contentHash
+                                        //};
 
-                                        NupkgMetadataFileFormat.Write(tempNupkgMetadataPath, hashFile);
+                                        //NupkgMetadataFileFormat.Write(tempNupkgMetadataPath, hashFile);
                                     }
                                 }
                             }
@@ -706,8 +706,8 @@ namespace NuGet.Packaging
                             }
 
                             var targetTempNupkg = Path.Combine(targetPath, Path.GetRandomFileName());
-                            var tempHashPath = Path.Combine(targetPath, Path.GetRandomFileName());
-                            var tempNupkgMetadataFilePath = Path.Combine(targetPath, Path.GetRandomFileName());
+                            //var tempHashPath = Path.Combine(targetPath, Path.GetRandomFileName());
+                            //var tempNupkgMetadataFilePath = Path.Combine(targetPath, Path.GetRandomFileName());
                             var packageSaveMode = packageExtractionContext.PackageSaveMode;
 
                             // Extract the nupkg
@@ -798,37 +798,37 @@ namespace NuGet.Packaging
                                 }
                             }
 
-                            if (packageSaveMode.HasFlag(PackageSaveMode.Files))
-                            {
-                                var hashFileName = Path.GetFileName(hashPath);
-                                var nupkgMetadataFileName = Path.GetFileName(nupkgMetadataFilePath);
-                                var packageFiles = (await packageDownloader.CoreReader.GetFilesAsync(cancellationToken))
-                                    .Where(file => ShouldInclude(file, hashFileName, nupkgMetadataFileName));
-                                var packageFileExtractor = new PackageFileExtractor(
-                                    packageFiles,
-                                    packageExtractionContext.XmlDocFileSaveMode);
-                                await packageDownloader.CoreReader.CopyFilesAsync(
-                                    targetPath,
-                                    packageFiles,
-                                    packageFileExtractor.ExtractPackageFile,
-                                    logger,
-                                    token);
-                            }
+                            //if (packageSaveMode.HasFlag(PackageSaveMode.Files))
+                            //{
+                            //    var hashFileName = Path.GetFileName(hashPath);
+                            //    var nupkgMetadataFileName = Path.GetFileName(nupkgMetadataFilePath);
+                            //    var packageFiles = (await packageDownloader.CoreReader.GetFilesAsync(cancellationToken))
+                            //        .Where(file => ShouldInclude(file, hashFileName, nupkgMetadataFileName));
+                            //    var packageFileExtractor = new PackageFileExtractor(
+                            //        packageFiles,
+                            //        packageExtractionContext.XmlDocFileSaveMode);
+                            //    await packageDownloader.CoreReader.CopyFilesAsync(
+                            //        targetPath,
+                            //        packageFiles,
+                            //        packageFileExtractor.ExtractPackageFile,
+                            //        logger,
+                            //        token);
+                            //}
 
-                            var packageHash = await packageDownloader.GetPackageHashAsync("SHA512", cancellationToken);
+                            //var packageHash = await packageDownloader.GetPackageHashAsync("SHA512", cancellationToken);
 
-                            File.WriteAllText(tempHashPath, packageHash);
+                            //File.WriteAllText(tempHashPath, packageHash);
 
                             // get hash for the unsigned content of package
-                            var contentHash = packageDownloader.SignedPackageReader.GetContentHash(cancellationToken, GetUnsignedPackageHash: () => packageHash);
+                            //var contentHash = packageDownloader.SignedPackageReader.GetContentHash(cancellationToken, GetUnsignedPackageHash: () => packageHash);
 
                             // write the new hash file
-                            var hashFile = new NupkgMetadataFile()
-                            {
-                                ContentHash = contentHash
-                            };
+                            //var hashFile = new NupkgMetadataFile()
+                            //{
+                            //    ContentHash = contentHash
+                            //};
 
-                            NupkgMetadataFileFormat.Write(tempNupkgMetadataFilePath, hashFile);
+                            //NupkgMetadataFileFormat.Write(tempNupkgMetadataFilePath, hashFile);
 
                             // Now rename the tmp file
                             if (packageExtractionContext.PackageSaveMode.HasFlag(PackageSaveMode.Nupkg))
@@ -860,9 +860,9 @@ namespace NuGet.Packaging
                             // Note: PackageRepository relies on the hash file being written out as the
                             // final operation as part of a package install to assume a package was fully installed.
                             // Rename the tmp hash file
-                            File.Move(tempHashPath, hashPath);
+                            //File.Move(tempHashPath, hashPath);
 
-                            File.Move(tempNupkgMetadataFilePath, nupkgMetadataFilePath);
+                            //File.Move(tempNupkgMetadataFilePath, nupkgMetadataFilePath);
 
                             logger.LogVerbose($"Completed installation of {packageIdentity.Id} {packageIdentity.Version}");
 

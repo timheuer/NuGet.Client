@@ -9,7 +9,16 @@ namespace NuGet.Common
     {
         public static NullProtocolDiagnostics Instance { get; } = new NullProtocolDiagnostics();
 
-        public void OnEvent(string source, string url, TimeSpan? headerDuration, TimeSpan requestDuration, bool isSuccess, bool isRetry, bool isCancelled)
+        public void OnEvent(
+            string source,
+            string url,
+            TimeSpan? headerDuration,
+            TimeSpan requestDuration,
+            int? httpStatusCode,
+            long bodyBytes,
+            bool isSuccess,
+            bool isRetry,
+            bool isCancelled)
         {
         }
     }

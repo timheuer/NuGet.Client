@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using NuGet.Common;
+using NuGet.Protocol.Utility;
 
 namespace NuGet.Protocol
 {
@@ -123,10 +124,10 @@ namespace NuGet.Protocol
                         if (response.Content != null)
                         {
                             var networkStream = await response.Content.ReadAsStreamAsync();
-                            var newContent = new DownloadTimeoutStreamContent(
-                                requestUri,
-                                networkStream,
-                                request.DownloadTimeout);
+                            var timeoutStream = new DownloadTimeoutStream(requestUri, networkStream, request.DownloadTimeout);
+                            var diagnosticsStream = new ProtocolDiagnosticsStream(timeoutStream, protocolDiagnostics, source, requestUri, isRetry: tries > 1, headerStopwatch.Elapsed, stopwatch, (int)response.StatusCode);
+
+                            var newContent = new StreamContent(diagnosticsStream);
 
                             // Copy over the content headers since we are replacing the HttpContent instance associated
                             // with the response message.
@@ -138,7 +139,7 @@ namespace NuGet.Protocol
                             response.Content = newContent;
                         }
 
-                        stopwatch.Stop();
+                        //stopwatch.Stop();
                         log.LogInformation("  " + string.Format(
                             CultureInfo.InvariantCulture,
                             Strings.Http_ResponseLog,
@@ -150,15 +151,13 @@ namespace NuGet.Protocol
                         {
                             success = false;
                         }
-
-                        protocolDiagnostics.OnEvent(source, requestMessage.RequestUri.ToString(), headerStopwatch.Elapsed, stopwatch.Elapsed, success, tries > 0, false);
                     }
                     catch (OperationCanceledException)
                     {
                         stopwatch.Stop();
                         response?.Dispose();
 
-                        protocolDiagnostics.OnEvent(source, requestMessage.RequestUri.ToString(), headerStopwatch.Elapsed, stopwatch.Elapsed, false, tries > 0, true);
+                        protocolDiagnostics.OnEvent(source, requestMessage.RequestUri.ToString(), headerStopwatch.Elapsed, stopwatch.Elapsed, httpStatusCode: null, bodyBytes: 0, false, tries > 1, true);
 
                         throw;
                     }
@@ -169,7 +168,7 @@ namespace NuGet.Protocol
 
                         response?.Dispose();
 
-                        protocolDiagnostics.OnEvent(source, requestMessage.RequestUri.ToString(), headerStopwatch.Elapsed, stopwatch.Elapsed, success, tries > 0, false);
+                        protocolDiagnostics.OnEvent(source, requestMessage.RequestUri.ToString(), headerStopwatch.Elapsed, stopwatch.Elapsed, null, 0, success, tries > 1, false);
 
                         if (tries >= request.MaxTries)
                         {
