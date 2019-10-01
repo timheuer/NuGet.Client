@@ -205,7 +205,11 @@ namespace NuGet.Protocol.Cancellation
 
         public static string DumpDiagnostics(this CancellationToken token)
         {
-            // DumpDiagnostics is OK with nulls
+            var source = token.GetSource();
+            if(source == null)
+            {
+                return "The CancellationTokenSource is null for some reason";
+            } 
             return token.GetSource().DumpDiagnostics();
         }
 
