@@ -210,7 +210,7 @@ namespace NuGet.Protocol.Cancellation
             {
                 return "The CancellationTokenSource is null for some reason";
             } 
-            return token.GetSource().DumpDiagnostics();
+            return source.DumpDiagnostics();
         }
 
 

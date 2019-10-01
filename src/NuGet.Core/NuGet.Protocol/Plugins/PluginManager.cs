@@ -266,6 +266,12 @@ namespace NuGet.Protocol.Plugins
                     var message = e.Message;
                     if (e is OperationCanceledException oce)
                     {
+                        var dumpDiagnostics = oce.CancellationToken.DumpDiagnostics();
+                        if (string.IsNullOrWhiteSpace(dumpDiagnostics))
+                        {
+                            dumpDiagnostics = "The dump diagnostics was null or whitespace, which means not recorded." + "\n" + e.StackTrace;
+                        }
+
                         message += "\n" + oce.CancellationToken.DumpDiagnostics();
                     }
 
