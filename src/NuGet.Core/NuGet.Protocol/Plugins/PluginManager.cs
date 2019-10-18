@@ -212,7 +212,6 @@ namespace NuGet.Protocol.Plugins
             {
                 try
                 {
-                    Debugger.Launch();
                     if (result.PluginFile.State.Value == PluginFileState.Valid)
                     {
                         var plugin = await _pluginFactory.GetOrCreateAsync(
@@ -279,7 +278,7 @@ namespace NuGet.Protocol.Plugins
 
                         message += "\n" + oce.CancellationToken.DumpDiagnostics();
                     }
-                    message += "\n" + e.StackTrace;
+                    message += "\n StackTrace: \n" + e.StackTrace;
 
                     pluginCreationResult = new PluginCreationResult(
                         string.Format(CultureInfo.CurrentCulture,

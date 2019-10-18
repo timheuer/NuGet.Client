@@ -20,8 +20,8 @@ namespace NuGet.Protocol.Plugins
             : base(now)
         {
             ThreadPool.GetMinThreads(out _minWorkerThreads, out _minCompletionPortThreads);
-            ThreadPool.GetAvailableThreads(out _workedThread, out _completionPortThread);
             ThreadPool.GetMaxThreads(out _maxWorkerThreads, out _maxCompletionPortThreads);
+            ThreadPool.GetAvailableThreads(out _workedThread, out _completionPortThread);
         }
 
         public override string ToString()

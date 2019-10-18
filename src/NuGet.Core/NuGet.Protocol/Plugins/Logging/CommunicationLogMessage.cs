@@ -12,14 +12,16 @@ namespace NuGet.Protocol.Plugins
         private readonly string _requestId;
         private readonly MessageState _state;
         private readonly MessageType _type;
+        private readonly string _details;
 
-        internal CommunicationLogMessage(DateTimeOffset now, string requestId, MessageMethod method, MessageType type, MessageState state)
+        internal CommunicationLogMessage(DateTimeOffset now, string requestId, MessageMethod method, MessageType type, MessageState state, string details = null)
             : base(now)
         {
             _requestId = requestId;
             _method = method;
             _type = type;
             _state = state;
+            _details = details;
         }
 
         public override string ToString()
@@ -28,7 +30,9 @@ namespace NuGet.Protocol.Plugins
                 new JProperty("request ID", _requestId),
                 new JProperty("method", _method),
                 new JProperty("type", _type),
-                new JProperty("state", _state));
+                new JProperty("state", _state),
+                new JProperty("details", _details)
+                );
 
             return ToString("communication", message);
         }
