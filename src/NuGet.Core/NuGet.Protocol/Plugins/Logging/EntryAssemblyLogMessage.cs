@@ -9,6 +9,7 @@ namespace NuGet.Protocol.Plugins
         private readonly string _fileVersion;
         private readonly string _fullName;
         private readonly string _informationalVersion;
+        private readonly string _location;
 
         internal EntryAssemblyLogMessage(DateTimeOffset now)
             : base(now)
@@ -18,6 +19,7 @@ namespace NuGet.Protocol.Plugins
             var fileVersionAttribute = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
 
             _fullName = assembly.FullName;
+            _location = assembly.Location;
 
             if (fileVersionAttribute != null)
             {
@@ -37,6 +39,11 @@ namespace NuGet.Protocol.Plugins
             if (!string.IsNullOrEmpty(_fileVersion))
             {
                 message.Add("file version", _fileVersion);
+            }
+
+            if (!string.IsNullOrEmpty(_location))
+            {
+                message.Add("location", _location);
             }
 
             if (!string.IsNullOrEmpty(_informationalVersion))
