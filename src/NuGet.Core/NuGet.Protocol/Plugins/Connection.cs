@@ -244,7 +244,14 @@ namespace NuGet.Protocol.Plugins
 
             if (_logger.IsEnabled)
             {
-                _logger.Write(new CommunicationLogMessage(_logger.Now, message.RequestId, message.Method, message.Type, MessageState.Sending));
+                string details = null;
+                if (message.Method == MessageMethod.SetLogLevel && message.Type == MessageType.Request)
+                {
+                    var payload = MessageUtilities.DeserializePayload<SetLogLevelRequest>(message);
+
+                    details = $"LogLevel = {payload.LogLevel}"; // why doesn't the throw here propagate places? Someone needs to listen to this shit?
+                }
+                _logger.Write(new CommunicationLogMessage(_logger.Now, message.RequestId, message.Method, message.Type, MessageState.Sending, details));
             }
 
             await _sender.SendAsync(message, cancellationToken);

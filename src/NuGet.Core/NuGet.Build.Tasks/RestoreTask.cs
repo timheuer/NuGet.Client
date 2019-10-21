@@ -85,8 +85,8 @@ namespace NuGet.Build.Tasks
         {
             _cts.Register("Build task cancellation source");
 #if DEBUG
-            var debugPackTask = Environment.GetEnvironmentVariable("DEBUG_RESTORE_TASK");
-            if (!string.IsNullOrEmpty(debugPackTask) && debugPackTask.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase))
+            var debugRestoreTask = Environment.GetEnvironmentVariable("DEBUG_RESTORE_TASK");
+            if (!string.IsNullOrEmpty(debugRestoreTask) && debugRestoreTask.Equals(bool.TrueString, StringComparison.OrdinalIgnoreCase))
             {
 #if IS_CORECLR
                 Console.WriteLine("Waiting for debugger to attach.");
@@ -116,6 +116,7 @@ namespace NuGet.Build.Tasks
 
             try
             {
+                DefaultCredentialServiceUtility.SetupDefaultCredentialService(log, !Interactive);
                 return ExecuteAsync(log).Result;
             }
             catch (AggregateException ex) when (_cts.Token.IsCancellationRequested && ex.InnerException is TaskCanceledException)
@@ -129,8 +130,15 @@ namespace NuGet.Build.Tasks
                 ExceptionUtilities.LogException(e, log);
                 return false;
             }
+            finally
+            {
+                // The CredentialService lifetime is for the duration of the process. We should not leave a potentially unavailable logger. 
+                // We need to update the delegating logger with a null instance
+                // because the tear downs of the plugins and similar rely on idleness and process exit.
+                DefaultCredentialServiceUtility.UpdateCredentialServiceDelegatingLogger(NullLogger.Instance);
+            }
         }
-
+ 
         private async Task<bool> ExecuteAsync(Common.ILogger log)
         {
             if (RestoreGraphItems.Length < 1 && !HideWarningsAndErrors)
@@ -200,8 +208,6 @@ namespace NuGet.Build.Tasks
                     HttpSourceResourceProvider.Throttle = SemaphoreSlimThrottle.CreateBinarySemaphore();
                 }
 
-                DefaultCredentialServiceUtility.SetupDefaultCredentialService(log, !Interactive);
-
                 _cts.Token.ThrowIfCancellationRequested();
 
                 var restoreSummaries = await RestoreRunner.RunAsync(restoreContext, _cts.Token);
@@ -212,6 +218,7 @@ namespace NuGet.Build.Tasks
                 return restoreSummaries.All(x => x.Success);
             }
         }
+
         private static void ConfigureProtocol()
         {
             // Set connection limit
