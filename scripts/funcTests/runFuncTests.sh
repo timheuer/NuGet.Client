@@ -22,7 +22,7 @@ mono --version
 # Download the CLI install script to cli
 echo "Installing dotnet CLI"
 mkdir -p cli
-curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
+curl -L -o cli/dotnet-install.sh https://dot.net/v1/dotnet-install.sh
 
 # Run install.sh
 chmod +x cli/dotnet-install.sh
