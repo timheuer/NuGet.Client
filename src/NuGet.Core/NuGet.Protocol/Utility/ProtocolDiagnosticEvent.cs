@@ -15,7 +15,7 @@ namespace NuGet.Protocol.Utility
         internal ProtocolDiagnosticEvent(
             DateTime timestamp,
             string source,
-            Uri url,
+            string url,
             TimeSpan? headerDuration,
             TimeSpan eventDuration,
             long bytes,

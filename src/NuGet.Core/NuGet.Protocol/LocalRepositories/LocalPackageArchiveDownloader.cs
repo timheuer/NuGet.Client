@@ -2,20 +2,22 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using NuGet.Common;
+using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Packaging.Signing;
+using NuGet.Protocol.Utility;
 
-namespace NuGet.Packaging
+namespace NuGet.Protocol
 {
     /// <summary>
     /// A package downloader for local archive packages.
     /// </summary>
-    [Obsolete("Use NuGet.Protocol.LocalPackageArchiveDownloader")]
     public sealed class LocalPackageArchiveDownloader : IPackageDownloader
     {
         private Func<Exception, Task<bool>> _handleExceptionAsync;
@@ -171,7 +173,17 @@ namespace NuGet.Packaging
 
                 cancellationToken.ThrowIfCancellationRequested();
 
-                using (var source = File.OpenRead(_packageFilePath))
+                var pde = new ProtocolDiagnosticInProgressEvent(
+                    Source,
+                    _packageFilePath,
+                    headerDuration: null,
+                    httpStatusCode: null,
+                    isRetry: false,
+                    isCancelled: false,
+                    isLastAttempt: true);
+
+                var sw = Stopwatch.StartNew();
+                using (var source = new ProtocolDiagnosticsStream(File.OpenRead(_packageFilePath), pde, sw, ProtocolDiagnostics.RaiseEvent))
                 using (var destination = new FileStream(
                     destinationFilePath,
                     FileMode.Create,

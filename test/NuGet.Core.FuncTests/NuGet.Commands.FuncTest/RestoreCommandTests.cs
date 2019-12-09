@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -22,6 +21,8 @@ using NuGet.Protocol.Core.Types;
 using NuGet.Test.Utility;
 using NuGet.Versioning;
 using Xunit;
+
+using LocalPackageArchiveDownloader = NuGet.Protocol.LocalPackageArchiveDownloader;
 
 namespace NuGet.Commands.FuncTest
 {

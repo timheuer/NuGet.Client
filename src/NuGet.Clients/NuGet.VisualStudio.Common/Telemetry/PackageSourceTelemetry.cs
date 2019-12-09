@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Protocol;
 using NuGet.Protocol.Utility;
 
 namespace NuGet.VisualStudio.Telemetry
@@ -34,7 +35,8 @@ namespace NuGet.VisualStudio.Telemetry
             _sources = new Dictionary<string, PackageSource>();
             foreach (var source in sources)
             {
-                _sources[source.Source] = source;
+                var sourceUri = source.IsLocal ? LocalFolderUtility.GetAndVerifyRootDirectory(source.Source).FullName : source.Source;
+                _sources[sourceUri] = source;
             }
         }
 
@@ -47,7 +49,7 @@ namespace NuGet.VisualStudio.Telemetry
         {
             var data = allData.GetOrAdd(pdEvent.Source, _ => new Data());
 
-            var resourceData = pdEvent.Url.OriginalString.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase)
+            var resourceData = pdEvent.Url.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase)
                 ? data.Nupkg
                 : data.Metadata;
 

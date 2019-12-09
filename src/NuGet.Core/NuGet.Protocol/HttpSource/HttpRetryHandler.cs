@@ -83,7 +83,8 @@ namespace NuGet.Protocol
                     }
                     requestMessage.Properties[StopwatchPropertyName] = stopwatches;
                     var requestUri = requestMessage.RequestUri;
-                    
+                    var requestUriString = requestUri.ToString();
+
                     try
                     {
                         // The only time that we will be disposing this existing response is if we have 
@@ -138,10 +139,10 @@ namespace NuGet.Protocol
                         if (response.Content != null)
                         {
                             var networkStream = await response.Content.ReadAsStreamAsync();
-                            var timeoutStream = new DownloadTimeoutStream(requestUri.ToString(), networkStream, request.DownloadTimeout);
+                            var timeoutStream = new DownloadTimeoutStream(requestUriString, networkStream, request.DownloadTimeout);
                             var inProgressEvent = new ProtocolDiagnosticInProgressEvent(
                                 source,
-                                requestUri,
+                                requestUriString,
                                 headerStopwatch?.Elapsed,
                                 (int)response.StatusCode,
                                 isRetry: request.IsRetry || tries > 1,
@@ -180,7 +181,7 @@ namespace NuGet.Protocol
                         ProtocolDiagnostics.RaiseEvent(new ProtocolDiagnosticEvent(
                             timestamp: DateTime.UtcNow,
                             source,
-                            requestUri,
+                            requestUriString,
                             headerDuration: null,
                             eventDuration: bodyStopwatch.Elapsed,
                             httpStatusCode: null,
@@ -201,7 +202,7 @@ namespace NuGet.Protocol
                         ProtocolDiagnostics.RaiseEvent(new ProtocolDiagnosticEvent(
                             timestamp: DateTime.UtcNow,
                             source,
-                            requestUri,
+                            requestUriString,
                             headerDuration: null,
                             eventDuration: bodyStopwatch.Elapsed,
                             httpStatusCode: null,

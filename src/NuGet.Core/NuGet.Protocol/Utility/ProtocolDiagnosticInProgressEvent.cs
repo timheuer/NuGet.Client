@@ -9,7 +9,7 @@ namespace NuGet.Protocol.Utility
     {
         internal ProtocolDiagnosticInProgressEvent(
             string source,
-            Uri url,
+            string url,
             TimeSpan? headerDuration,
             int? httpStatusCode,
             bool isRetry,

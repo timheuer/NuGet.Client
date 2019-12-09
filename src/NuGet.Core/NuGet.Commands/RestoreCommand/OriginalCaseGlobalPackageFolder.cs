@@ -16,6 +16,8 @@ using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
 using NuGet.Repositories;
 
+using LocalPackageArchiveDownloader = NuGet.Protocol.LocalPackageArchiveDownloader;
+
 namespace NuGet.Commands
 {
     public class OriginalCaseGlobalPackageFolder

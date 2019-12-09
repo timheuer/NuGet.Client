@@ -14,6 +14,8 @@ using NuGet.Test.Utility;
 using NuGet.Versioning;
 using Xunit;
 
+using LocalPackageArchiveDownloader = NuGet.Protocol.LocalPackageArchiveDownloader;
+
 namespace Commands.Test
 {
     public class NugetPackageUtilsTests

@@ -15,11 +15,12 @@ using NuGet.LibraryModel;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.ProjectModel;
-using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Test.Utility;
 using NuGet.Versioning;
 using Xunit;
+
+using LocalPackageArchiveDownloader = NuGet.Protocol.LocalPackageArchiveDownloader;
 
 namespace NuGet.Commands.Test
 {
