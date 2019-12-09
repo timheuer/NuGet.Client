@@ -127,7 +127,7 @@ namespace NuGet.Protocol.Tests.Utility
         {
             return new ProtocolDiagnosticInProgressEvent(
                 source: "https://source.test/",
-                url: new Uri("https://source.test/resource"),
+                url: "https://source.test/resource",
                 headerDuration: null,
                 httpStatusCode: null,
                 isRetry: false,

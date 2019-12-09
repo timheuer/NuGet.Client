@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Protocol.Core.Types;
 using NuGet.Protocol.Utility;
 using NuGet.VisualStudio.Telemetry;
 using Xunit;
@@ -21,10 +22,10 @@ namespace NuGet.VisualStudio.Common.Test.Telemetry
         {
             // Arrange
             const string feedUrl = "https://source.test/v3/index.json";
-            PackageSource[] sources = new[]
+            SourceRepository[] sources = new[]
             {
-                new PackageSource(source: feedUrl, name: "Source1"),
-                new PackageSource(source: feedUrl, name: "Source2")
+                new SourceRepository(new PackageSource(source: feedUrl, name: "Source1"), Repository.Provider.GetCoreV3()),
+                new SourceRepository(new PackageSource(source: feedUrl, name: "Source2"), Repository.Provider.GetCoreV3())
             };
 
             // Act
@@ -40,7 +41,7 @@ namespace NuGet.VisualStudio.Common.Test.Telemetry
         public void AddAggregateData_SplitsMetadataAndNupkgCorrectly(string url, bool isNupkg)
         {
             // Arrange
-            var pde = CreateSampleProtocolDiagnosticsEvent(url: new Uri(url));
+            var pde = CreateSampleProtocolDiagnosticsEvent(url: url);
             var data = new ConcurrentDictionary<string, PackageSourceTelemetry.Data>();
 
             // Act
@@ -196,47 +197,45 @@ namespace NuGet.VisualStudio.Common.Test.Telemetry
         }
 
         [Fact]
-        public void ToTelemetry_ZeroRequests_DoesNotCreateTelemetryObject()
+        public async Task ToTelemetry_ZeroRequests_DoesNotCreateTelemetryObject()
         {
             // Arrange
             var data = new PackageSourceTelemetry.Data();
             data.Metadata.EventTiming.Requests = 0;
             data.Nupkg.EventTiming.Requests = 0;
 
-            var packageSource = new PackageSource("source");
+            var sourceRepository = new SourceRepository(new PackageSource("source"), Repository.Provider.GetCoreV3());
 
             // Act
-            var result = PackageSourceTelemetry.ToTelemetry(data, packageSource.Source, packageSource, "parentId");
+            var result = await PackageSourceTelemetry.ToTelemetryAsync(data, sourceRepository.PackageSource.Source, sourceRepository, "parentId");
 
             // Assert
             Assert.Null(result);
         }
 
         [Fact]
-        public void ToTelemetry_WithSource_HasSourceTelemetryProperties()
+        public async Task ToTelemetry_WithSource_HasSourceTelemetryProperties()
         {
             // Arrange
             var data = new PackageSourceTelemetry.Data();
             data.Metadata.EventTiming.Requests = 1;
 
-            var packageSource = new PackageSource(NuGetConstants.V3FeedUrl);
-            packageSource.ProtocolVersion = 3;
+            var sourceRepository = new SourceRepository(new PackageSource(NuGetConstants.V3FeedUrl), Repository.Provider.GetCoreV3());
 
             // Act
-            var result = PackageSourceTelemetry.ToTelemetry(data, packageSource.Source, packageSource, "parentId");
+            var result = await PackageSourceTelemetry.ToTelemetryAsync(data, sourceRepository.PackageSource.Source, sourceRepository, "parentId");
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(PackageSourceTelemetry.EventName, result.Name);
             Assert.Equal("parentId", result[PackageSourceTelemetry.PropertyNames.ParentId]);
-            Assert.Equal("http", result[PackageSourceTelemetry.PropertyNames.Source.Type]);
-            Assert.Equal(3, result[PackageSourceTelemetry.PropertyNames.Source.Protocol]);
+            Assert.Equal("HttpV3", result[PackageSourceTelemetry.PropertyNames.Source.Type]);
             var url = Assert.Single(result.GetPiiData().Where(pair => pair.Key == PackageSourceTelemetry.PropertyNames.Source.Url));
             Assert.Equal(NuGetConstants.V3FeedUrl, url.Value);
         }
 
         [Fact]
-        public void ToTelemetry_WithNupkgData_CreatesTelemetryProperties()
+        public async Task ToTelemetry_WithNupkgData_CreatesTelemetryProperties()
         {
             // Arrange
             var data = new PackageSourceTelemetry.Data();
@@ -262,10 +261,10 @@ namespace NuGet.VisualStudio.Common.Test.Telemetry
             resourceData.StatusCodes.Add(200, 7);
             resourceData.StatusCodes.Add(404, 3);
 
-            var source = new PackageSource("source");
+            var source = new SourceRepository(new PackageSource("source"), Repository.Provider.GetCoreV3());
 
             // Act
-            var result = PackageSourceTelemetry.ToTelemetry(data, source.Source, source, "parentid");
+            var result = await PackageSourceTelemetry.ToTelemetryAsync(data, source.PackageSource.Source, source, "parentid");
 
             // Assert
             Assert.NotNull(result);
@@ -326,12 +325,12 @@ namespace NuGet.VisualStudio.Common.Test.Telemetry
             Assert.Equal(expectedDuration, totals.Duration);
         }
 
-        private static readonly Uri SampleNupkgUri = new Uri("https://source.test/v3/flatcontainer/package/package.1.0.0.nupkg");
+        private static readonly string SampleNupkgUri = "https://source.test/v3/flatcontainer/package/package.1.0.0.nupkg";
 
         private static ProtocolDiagnosticEvent CreateSampleProtocolDiagnosticsEvent(
             DateTime? timestamp = null,
             string source = "https://source.test/v3/index.json",
-            Uri url = null,
+            string url = null,
             TimeSpan? headerDuration = null,
             TimeSpan? eventDuration = null,
             long bytes = 1_000_000,

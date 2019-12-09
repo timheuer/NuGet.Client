@@ -5,9 +5,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
 using NuGet.Protocol.Utility;
 
 namespace NuGet.VisualStudio.Telemetry
@@ -15,12 +18,12 @@ namespace NuGet.VisualStudio.Telemetry
     public sealed class PackageSourceTelemetry : IDisposable
     {
         private readonly ConcurrentDictionary<string, Data> _data;
-        private readonly IDictionary<string, PackageSource> _sources;
+        private readonly IDictionary<string, SourceRepository> _sources;
         private readonly Guid _parentId;
 
         internal static readonly string EventName = "PackageSourceDiagnostics";
 
-        public PackageSourceTelemetry(IEnumerable<PackageSource> sources, Guid parentId)
+        public PackageSourceTelemetry(IEnumerable<SourceRepository> sources, Guid parentId)
         {
             if (sources == null)
             {
@@ -32,10 +35,10 @@ namespace NuGet.VisualStudio.Telemetry
             _parentId = parentId;
 
             // Multiple sources can use the same feed url. We can't know which one protocol events come from, so choose any.
-            _sources = new Dictionary<string, PackageSource>();
+            _sources = new Dictionary<string, SourceRepository>();
             foreach (var source in sources)
             {
-                var sourceUri = source.IsLocal ? LocalFolderUtility.GetAndVerifyRootDirectory(source.Source).FullName : source.Source;
+                var sourceUri = source.PackageSource.IsLocal ? LocalFolderUtility.GetAndVerifyRootDirectory(source.PackageSource.Source).FullName : source.PackageSource.Source;
                 _sources[sourceUri] = source;
             }
         }
@@ -118,19 +121,19 @@ namespace NuGet.VisualStudio.Telemetry
             ProtocolDiagnostics.Event -= ProtocolDiagnostics_Event;
         }
 
-        public void SendTelemetry()
+        public async Task SendTelemetryAsync()
         {
             var parentId = _parentId.ToString();
             foreach (var kvp in _data)
             {
                 Data data = kvp.Value;
                 string source = kvp.Key;
-                if (!_sources.TryGetValue(kvp.Key, out PackageSource packageSource))
+                if (!_sources.TryGetValue(kvp.Key, out SourceRepository sourceRepository))
                 {
-                    packageSource = null;
+                    sourceRepository = null;
                 }
 
-                var telemetry = ToTelemetry(data, source, packageSource, parentId);
+                var telemetry = await ToTelemetryAsync(data, source, sourceRepository, parentId);
 
                 if (telemetry != null)
                 {
@@ -139,7 +142,7 @@ namespace NuGet.VisualStudio.Telemetry
             }
         }
 
-        internal static TelemetryEvent ToTelemetry(Data data, string source, PackageSource packageSource, string parentId)
+        internal static async Task<TelemetryEvent> ToTelemetryAsync(Data data, string source, SourceRepository sourceRepository, string parentId)
         {
             if (data.Metadata.EventTiming.Requests == 0 && data.Nupkg.EventTiming.Requests == 0)
             {
@@ -155,23 +158,15 @@ namespace NuGet.VisualStudio.Telemetry
             // source info
             telemetry.AddPiiData(PropertyNames.Source.Url, source);
 
-            if (packageSource == null)
+            if (sourceRepository == null)
             {
-                packageSource = new PackageSource(source);
+                sourceRepository = new SourceRepository(new PackageSource(source), Repository.Provider.GetCoreV3());
             }
 
-            if (packageSource.IsHttp)
-            {
-                telemetry[PropertyNames.Source.Type] = "http";
-                telemetry[PropertyNames.Source.Protocol] = TelemetryUtility.IsHttpV3(packageSource) ? 3 : packageSource.ProtocolVersion;
-            }
-            else
-            {
-                telemetry[PropertyNames.Source.Type] = "local";
-                telemetry[PropertyNames.Source.Protocol] = packageSource.ProtocolVersion;
-            }
+            var sourceType = await sourceRepository.GetFeedType(CancellationToken.None);
+            telemetry[PropertyNames.Source.Type] = sourceType.ToString();
 
-            var msFeed = GetMsFeed(packageSource);
+            var msFeed = GetMsFeed(sourceRepository.PackageSource);
             if (msFeed != null)
             {
                 telemetry[PropertyNames.Source.MSFeed] = msFeed;
@@ -417,13 +412,11 @@ namespace NuGet.VisualStudio.Telemetry
                 {
                     Url = prefix + ".url";
                     Type = prefix + ".type";
-                    Protocol = prefix + ".nugetprotocol";
                     MSFeed = prefix + ".msfeed";
                 }
 
                 internal string Url { get; }
                 internal string Type { get; }
-                internal string Protocol { get; }
                 internal string MSFeed { get; }
             }
 
