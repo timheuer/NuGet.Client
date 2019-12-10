@@ -30,7 +30,8 @@ namespace NuGet.VisualStudio
 {
     [Export(typeof(IVsPackageInstaller))]
     [Export(typeof(IVsPackageInstaller2))]
-    public class VsPackageInstaller : IVsPackageInstaller2
+    [Export(typeof(IVsAsyncPackageInstaller))]
+    public class VsPackageInstaller : IVsPackageInstaller2, IVsAsyncPackageInstaller
     {
         private readonly ISourceRepositoryProvider _sourceRepositoryProvider;
         private readonly Configuration.ISettings _settings;
@@ -312,6 +313,23 @@ namespace NuGet.VisualStudio
                         ignoreDependencies: ignoreDependencies,
                         token: CancellationToken.None);
                 });
+        }
+
+        public async Task<bool> InstallPackageAsync(string source, Project project, string packageId, string version, bool ignoreDependencies)
+        {
+            NuGetVersion nugetVersion = null;
+            if (version != null)
+            {
+                NuGetVersion.TryParse(version, out nugetVersion);
+            }
+            await InstallPackageAsync(source, project, packageId, nugetVersion, includePrerelease: true, ignoreDependencies: ignoreDependencies);
+            return true;
+        }
+
+        public async Task<bool> InstallLatestPackageAsync(string source, Project project, string packageId, bool includePrerelease, bool ignoreDependencies)
+        {
+            await InstallPackageAsync(source, project, packageId, version: null, includePrerelease: includePrerelease, ignoreDependencies: ignoreDependencies);
+            return true;
         }
 
         private static List<PackageIdentity> GetIdentitiesFromDict(IDictionary<string, string> packageVersions)
