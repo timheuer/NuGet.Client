@@ -39,7 +39,7 @@ namespace Dotnet.Integration.Test
 
             //Temporary patching process for System.Security.Cryptography.Pkcs.dll and deps.json file
             //Will be removed when shipping
-            var patchDir = sdkPaths.Where(path => path.Split(Path.DirectorySeparatorChar).Last().StartsWith("3")).First();
+            var patchDir = sdkPaths.Where(path => path.Split(Path.DirectorySeparatorChar).Last().StartsWith("5")).First();
             TempPatching(patchDir);
 
             string packagePath = null;
@@ -502,7 +502,7 @@ namespace Dotnet.Integration.Test
         }
         private void TempPatchingDepsJsonForNewlyAddedDlls(string[] filePaths)
         {
-            string nugetBuildTasksName = "NuGet.Build.Tasks/5.2.0-rtm.6067";
+            string nugetBuildTasksName = "NuGet.Build.Tasks/5.3.0-rtm.6251";
             foreach (string file in filePaths)
             {
                 JObject JsonFile = GetJson(file);
@@ -510,11 +510,11 @@ namespace Dotnet.Integration.Test
                 JObject targets = null;
                 targets = JsonFile.GetJObjectProperty<JObject>("targets");
 
-                JObject netcoreapp30 = null;
-                netcoreapp30 = targets.GetJObjectProperty<JObject>(".NETCoreApp,Version=v3.0");
+                JObject netcoreapp50 = null;
+                netcoreapp50 = targets.GetJObjectProperty<JObject>(".NETCoreApp,Version=v5.0");
 
                 JObject NuGet_Build_Tasks = null;
-                NuGet_Build_Tasks = netcoreapp30.GetJObjectProperty<JObject>(nugetBuildTasksName);
+                NuGet_Build_Tasks = netcoreapp50.GetJObjectProperty<JObject>(nugetBuildTasksName);
 
                 JObject runtime = null;
                 runtime = NuGet_Build_Tasks.GetJObjectProperty<JObject>("runtime");
@@ -523,13 +523,13 @@ namespace Dotnet.Integration.Test
                             new JObject
                                 {
                                     new JProperty("assemblyVersion","4.0.4.0"),
-                                    new JProperty("fileVersion", "4.700.19.40503"),
+                                    new JProperty("fileVersion", "5.0.19.47301"),
                                 }
                             );
                 runtime.Add(jproperty);
                 NuGet_Build_Tasks["runtime"] = runtime;
-                netcoreapp30[nugetBuildTasksName] = NuGet_Build_Tasks;
-                targets[".NETCoreApp,Version=v3.0"] = netcoreapp30;
+                netcoreapp50[nugetBuildTasksName] = NuGet_Build_Tasks;
+                targets[".NETCoreApp,Version=v5.0"] = netcoreapp50;
                 JsonFile["targets"] = targets;
                 SaveJson(JsonFile, file);
             }
