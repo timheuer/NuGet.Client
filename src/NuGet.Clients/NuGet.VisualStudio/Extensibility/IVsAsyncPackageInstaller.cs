@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using EnvDTE;
 
@@ -10,6 +11,8 @@ namespace NuGet.VisualStudio
     /// <summary>
     /// Contains methods to install packages into a project within the current solution.
     /// </summary>
+    [ComImport]
+    [Guid("CE3EBDFC-1248-40D8-BCEB-E8920FDDC495")]
     public interface IVsAsyncPackageInstaller
     {
         /// <summary>

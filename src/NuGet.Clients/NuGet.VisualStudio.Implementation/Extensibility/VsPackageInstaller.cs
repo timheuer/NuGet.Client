@@ -315,6 +315,8 @@ namespace NuGet.VisualStudio
                 });
         }
 
+#region NEWAPI
+
         public async Task<bool> InstallPackageAsync(string source, Project project, string packageId, string version, bool ignoreDependencies)
         {
             NuGetVersion nugetVersion = null;
@@ -331,6 +333,8 @@ namespace NuGet.VisualStudio
             await InstallPackageAsync(source, project, packageId, version: null, includePrerelease: includePrerelease, ignoreDependencies: ignoreDependencies);
             return true;
         }
+
+#endregion
 
         private static List<PackageIdentity> GetIdentitiesFromDict(IDictionary<string, string> packageVersions)
         {

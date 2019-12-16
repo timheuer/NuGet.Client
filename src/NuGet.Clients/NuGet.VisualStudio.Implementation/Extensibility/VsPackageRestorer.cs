@@ -39,7 +39,7 @@ namespace NuGet.VisualStudio
             {
                 var solutionDirectory = _solutionManager.SolutionDirectory;
                 var nuGetProjectContext = new EmptyNuGetProjectContext();
-
+// TODO NK - Won't init.ps1 scripts deadlock here?
                 // We simply use ThreadHelper.JoinableTaskFactory.Run instead of PumpingJTF.Run, unlike,
                 // VsPackageInstaller and VsPackageUninstaller. Because, no powershell scripts get executed
                 // as part of the operations performed below. Powershell scripts need to be executed on the
