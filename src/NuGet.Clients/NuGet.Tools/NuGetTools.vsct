@@ -80,6 +80,18 @@
         </Strings>
       </Button>
 
+       <Button guid="guidDialogCmdSet" id="cmdIdDONNIETEST" priority="0x0150" type="Button">
+        <Parent guid="guidReferenceContext" id="cmdAddReferenceGroup" />
+        <Icon guid="guidToolbarImages" id="bmpAddNuGetPackage" />
+        <CommandFlag>AllowParams</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>cmdidAddPackages</CommandName>
+          <ButtonText>DONNIE TEST BUTTON...</ButtonText>
+        </Strings>
+      </Button>
+
       <Button guid="guidDialogCmdSet" id="cmdidUpgradeNuGetProject" priority="0x0400" type="Button">
         <Parent guid="guidReferenceContext" id="cmdAddReferenceGroup" />
         <Icon guid="guidToolbarImages" id="bmpUpgradeNuGetProject" />
@@ -163,6 +175,7 @@
   
   <VisibilityConstraints>
     <VisibilityItem guid="guidDialogCmdSet" id="cmdidAddPackages" context="UICONTEXT_SolutionExistsAndNotBuildingAndNotDebugging" />
+    <VisibilityItem guid="guidDialogCmdSet" id="cmdIdDONNIETEST" context="UICONTEXT_SolutionExistsAndNotBuildingAndNotDebugging" />
     <VisibilityItem guid="guidDialogCmdSet" id="cmdidAddPackagesForSolution" context="UICONTEXT_SolutionExistsAndNotBuildingAndNotDebugging" />
     <VisibilityItem guid="guidDialogCmdSet" id="cmdidRestorePackages" context="UICONTEXT_SolutionExistsAndNotBuildingAndNotDebugging" />
     <VisibilityItem guid="guidDialogCmdSet" id="cmdidUpgradePackagesConfig" context="UICONTEXT_UpgradeableProjectLoaded" />
@@ -174,12 +187,6 @@
       <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1"/>
     </CommandPlacement>
 
-    <CommandPlacement  guid="guidToolsGroup" id="idLibraryPackageManager">
-      <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_OTHER2" />
-    </CommandPlacement>
-
-    
-    
     <CommandPlacement guid="guidPowerConsoleCmdSet" id="cmdidPowerConsole" priority="0x0100">
       <Parent guid="guidToolsGroup" id="idToolsGroup"/>
     </CommandPlacement>
@@ -197,9 +204,12 @@
     <CommandPlacement guid="guidDialogCmdSet" id="cmdidAddPackages" priority="0xF100">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_REFROOT_ADD"/>
     </CommandPlacement>
-    <CommandPlacement guid="guidDialogCmdSet" id="cmdidAddPackages">
-      <Parent guid="guidReferenceContext" id="cmdAddReferenceGroup" />
+
+    <CommandPlacement guid="guidDialogCmdSet" id="cmdIdDONNIETEST" priority="0xF200">
+      <Parent guid="guidVenusCmdId" id="IDG_CTX_REFERENCE"/>
     </CommandPlacement>
+
+  
     <CommandPlacement guid="guidDialogCmdSet" id="cmdidAddPackages" priority="0xF100">
       <Parent guid="guidSHLMainMenu" id="IDG_VS_CTXT_PROJECT_ADD"/>
     </CommandPlacement>
@@ -262,6 +272,7 @@
       <IDSymbol name="cmdidRestorePackages" value="0x0300" />
       <IDSymbol name="cmdidUpgradeNuGetProject" value="0x0400" />
       <IDSymbol name="cmdidUpgradePackagesConfig" value="0x0410" />
+      <IDSymbol name="cmdIdDONNIETEST" value="0x500"/>
     </GuidSymbol>
     <GuidSymbol name="guidVenusCmdId" value="{C7547851-4E3A-4E5B-9173-FA6E9C8BD82C}" >
       <IDSymbol name="IDG_VENUS_CTX_REFERENCE" value="27" />

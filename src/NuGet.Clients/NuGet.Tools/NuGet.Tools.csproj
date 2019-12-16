@@ -46,7 +46,6 @@
     <Compile Include="Guids.cs" />
     <Compile Include="NuGetFeedbackDiagnosticFileProvider.cs" />
     <Compile Include="NuGetPackage.cs" />
-    <Compile Include="NuGetProjectItemContextMenuProvider.cs" />
     <Compile Include="NuGetSearchProvider.cs" />
     <Compile Include="NuGetSearchTask.cs" />
     <Compile Include="NuGetSettings.cs" />
@@ -157,11 +156,6 @@
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.ProjectSystem">
-      <Version>16.0.374-pre</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(BuildCommonDirectory)common.targets" />
   <Import Project="$(BuildCommonDirectory)embedinterop.targets" />
