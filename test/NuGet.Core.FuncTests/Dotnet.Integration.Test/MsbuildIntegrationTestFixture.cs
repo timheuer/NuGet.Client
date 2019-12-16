@@ -37,7 +37,7 @@ namespace Dotnet.Integration.Test
 
             var sdkPaths = Directory.GetDirectories(Path.Combine(_cliDirectory, "sdk"));
 
-            //Temporary patching process for System.Security.Cryptography.Pkcs.dll and deps.json file
+            //Temporary patching process for System.Security.Cryptography.Pkcs.dll and deps.json files
             //Will be removed when shipping
             var patchDir = sdkPaths.Where(path => path.Split(Path.DirectorySeparatorChar).Last().StartsWith("5")).First();
             TempPatching(patchDir);
@@ -52,7 +52,7 @@ namespace Dotnet.Integration.Test
                 packagePath = Path.Combine(Environment.GetEnvironmentVariable("HOME"), ".local", "share", "NuGet", "v3-cache");
             }
 
-            var pathCopyFrom = Path.Combine(packagePath, "system.security.cryptography.pkcs", "4.6.0-preview8.19405.3", "lib", "netstandard2.1");
+            var pathCopyFrom = Path.Combine(packagePath, "system.security.cryptography.pkcs", "5.0.0-alpha1.19473.1", "lib", "netstandard2.1");
             var pathCopyTo = patchDir;
             var dlls = new string[1] { "System.Security.Cryptography.Pkcs.dll" };
             TempCopyNewlyAddedDlls(dlls, pathCopyFrom, pathCopyTo);
