@@ -79,10 +79,8 @@ namespace NuGet.Packaging.Signing
                 var fatalStatuses = new List<X509ChainStatus>();
                 var logCode = certificateType == CertificateType.Timestamp ? NuGetLogCode.NU3028 : NuGetLogCode.NU3018;
 
-                var status = new StringBuilder();
                 foreach (var chainStatus in chain.ChainStatus)
                 {
-                    status.AppendLine($"({chainStatus.Status}):  {chainStatus.StatusInformation}");
 
                     if ((chainStatus.Status & errorStatusFlags) != 0)
                     {

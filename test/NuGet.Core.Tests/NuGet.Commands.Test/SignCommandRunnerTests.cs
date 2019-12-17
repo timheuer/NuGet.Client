@@ -108,7 +108,7 @@ namespace NuGet.Commands.Test
             using (var test = await Test.CreateAsync(_fixture.GetDefaultCertificate()))
             {
                 test.Args.CertificateSubjectName = "Root";
-                if (RuntimeEnvironmentHelper.IsWindows)
+                if (RuntimeEnvironmentHelper.IsWindows || RuntimeEnvironmentHelper.IsMacOSX)
                 {
                     test.Args.CertificateStoreLocation = StoreLocation.LocalMachine;
                 }
@@ -116,7 +116,6 @@ namespace NuGet.Commands.Test
                 {
                     test.Args.CertificateStoreLocation = StoreLocation.CurrentUser;
                 }
-                //TODO: how about other runtime environment? 
                 
                 test.Args.CertificateStoreName = StoreName.Root;
 
