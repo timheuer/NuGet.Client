@@ -1,11 +1,12 @@
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
 using System.Globalization;
-using System.Runtime.Serialization;
 
-namespace NuGet.CommandLine.Common
+namespace Test.Utility
 {
-    [Serializable]
-    class SystemToolException : Exception
+    internal sealed class SystemToolException : Exception
     {
         public SystemToolException()
         {
@@ -23,11 +24,6 @@ namespace NuGet.CommandLine.Common
 
         public SystemToolException(string message, Exception exception)
             : base(message, exception)
-        {
-        }
-
-        protected SystemToolException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }

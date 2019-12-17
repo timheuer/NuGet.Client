@@ -43,6 +43,8 @@ namespace Test.Utility.Signing
 
         private bool _isDisposed;
 
+        private const string KeychainForMac = "/Library/Keychains/System.keychain";
+
         public TrustedTestCert(T source,
             Func<T, X509Certificate2> getCert,
             StoreName storeName = StoreName.TrustedPeople,
@@ -93,7 +95,7 @@ namespace Test.Utility.Signing
             File.WriteAllBytes(certFile.FullName, TrustedCert.RawData);
 
             string addToKeyChainCmd = $"sudo security add-trusted-cert -d -r trustRoot " +
-                                      $"-k \"/Library/Keychains/System.keychain\" " +
+                                      $"-k \"{KeychainForMac}\" " +
                                       $"\"{certFile.FullName}\"";
 
             RunMacCommand(addToKeyChainCmd);
@@ -106,7 +108,7 @@ namespace Test.Utility.Signing
         {
             var certFile = new FileInfo(Path.Combine("/tmp", $"{TrustedCert.Thumbprint}.cer"));
 
-            string removeFromKeyChainCmd = $"sudo security delete-certificate -Z {TrustedCert.Thumbprint} /Library/Keychains/System.keychain";
+            string removeFromKeyChainCmd = $"sudo security delete-certificate -Z {TrustedCert.Thumbprint} {KeychainForMac} -t";
 
             RunMacCommand(removeFromKeyChainCmd);
 
